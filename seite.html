@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8"/>
+  <title>Unser server</title>
+  <style>
+    :root{ --accent: rgb(30,103,128); --muted: rgba(255,255,255,0.06); }
+    body { background-color: lightblue; margin: 0; font-family: Arial, Helvetica, sans-serif; color: #012; }
+    header { position: relative; background-color: var(--accent); color: white; height: 180px; box-shadow: 25px 14px 126px 0px lightgoldenrodyellow inset; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 12px 24px; }
+    .headline { color: lightskyblue; font-size: 40px; margin: 0; text-align: center; line-height: 1; }
+    .subhead { color: #e6f7fb; font-size: 18px; margin-top: 6px; text-align: center; }
+
+    .auth { position: absolute; top: 12px; right: 16px; display: flex; flex-direction: column; gap: 8px; align-items: flex-end; }
+    .auth a, .auth button { display: inline-block; text-decoration: none; color: white; background: rgba(0,0,0,0.18); padding: 8px 14px; border-radius: 6px; font-weight: 600; border: none; cursor: pointer; }
+
+    main { max-width: 1100px; margin: 22px auto; padding: 0 18px; }
+
+    /* Hero */
+    .hero { display: grid; grid-template-columns: 1fr 420px; gap: 18px; align-items: center; margin-bottom: 22px; }
+    .hero .intro { background: var(--muted); padding: 18px; border-radius: 12px; box-shadow: 0 8px 20px rgba(0,0,0,0.06); }
+    .hero h2 { margin-top: 0; color: #003; }
+    .hero p { margin: 10px 0 0; color: #023; line-height: 1.5; }
+    .hero .hero-image { width: 100%; height: 260px; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.12); }
+    .hero .hero-image img { width:100%; height:100%; object-fit:cover; display:block; }
+
+    /* Features */
+    .features { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 12px; }
+    .card { background: rgba(255,255,255,0.06); padding: 16px; border-radius: 10px; text-align: center; box-shadow: 0 8px 20px rgba(0,0,0,0.06); }
+    .card img { width: 100%; height: 140px; object-fit:cover; border-radius: 8px; margin-bottom: 10px; }
+    .card h3 { margin: 6px 0; color:#023; }
+    .card p { margin: 0; color:#045; font-size:14px; }
+
+    /* Gallery */
+    .gallery { display:flex; gap:12px; margin-top:18px; justify-content:center; flex-wrap:wrap; }
+    .gallery img { width: 48%; max-width:360px; height:200px; object-fit:cover; border-radius:10px; box-shadow:0 8px 20px rgba(0,0,0,0.08); }
+    .gallery .caption { text-align:center; width:100%; color:#023; margin-top:8px; font-weight:600; }
+
+    /* CTA */
+    .cta-row { display:flex; gap:12px; justify-content:center; margin: 22px 0; flex-wrap:wrap; }
+    .btn-cta { background: rgba(0,0,0,0.18); color: #fff; padding: 14px 20px; border-radius: 10px; text-decoration: none; font-weight: 800; box-shadow: 0 8px 20px rgba(0,0,0,0.12); cursor:pointer; border:none; }
+    .btn-cta.secondary { background: rgba(0,0,0,0.08); color: #012; font-weight:700; }
+
+    @media (max-width: 980px){ .hero { grid-template-columns: 1fr; } .features { grid-template-columns: 1fr; } .gallery img { width:100%; max-width:100%; } }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="auth" id="authArea">
+      <div id="notLogged">
+        <!-- Anmelden öffnet jetzt die Registrieren-Seite wie gewünscht -->
+        <a href="login.html">Anmelden</a>
+        <a href="registrieren.html">Registrieren</a>
+        <a class="btn" href="hilfe.html">Hilfe</a>
+      </div>
+      <div id="logged" style="display:none; text-align:right;">
+        <div class="user-label" id="userLabel" style="color:#dff6ff; font-size:14px; margin-bottom:6px;"></div>
+        <a class="btn" href="hilfe.html">Hilfe</a>
+        <button id="logoutBtn">Abmelden</button>
+      </div>
+    </div>
+
+    <h1 class="headline">Willkommen zu unserer Minecraft-Server Seite!</h1>
+    <p class="subhead">Tritt unserer Community bei, spiele mit anderen und erlebe Events.</p>
+  </header>
+
+  <main>
+    <section class="hero" aria-label="Intro">
+      <div class="intro">
+        <h2>Warum du beitreten solltest</h2>
+        <p>Unsere Community bietet einen freundlichen Server, regelmäßige Events und aktive Hilfe — perfekt für Einsteiger und erfahrene Spieler. Treffe neue Leute, baue gemeinsam und profitiere von Backups, Plugins und fairen Regeln.</p>
+        <div class="cta-row" style="margin-top:16px;">
+          <button class="btn-cta" id="joinBtn">Jetzt beitreten</button>
+          <button class="btn-cta secondary" id="moreInfoBtn">Mehr Infos</button>
+        </div>
+      </div>
+
+      <div class="hero-image" aria-hidden="false">
+        <img src="bild2.png" alt="Community / Server Bild">
+      </div>
+    </section>
+
+    <section>
+      <h2 style="text-align:center; color:#023; margin-bottom:10px;">Was dich erwartet</h2>
+      <div class="features">
+        <div class="card">
+          <img src="bild2.png" alt="Freundliche Community">
+          <h3>Freundliche Community</h3>
+          <p>Hilfsbereite Mitglieder, aktive Moderation und ein entspannter Umgang — du könntest mit drauf sein.</p>
+        </div>
+
+        <div class="card">
+          <img src="bild3.png" alt="Schöner Server">
+          <h3>Schöner Server</h3>
+          <p>Schöne Landschaften, liebevoll gestaltete Spawns und kreative Bauprojekte — perfekt zum Mitgestalten.</p>
+        </div>
+
+        <div class="card">
+          <img src="bild1.png" alt="Giveaways">
+          <h3>Events & Giveaways</h3>
+          <p>Regelmäßige Events, Bauwettbewerbe und Verlosungen halten den Server spannend.</p>
+        </div>
+      </div>
+
+      
+    </section>
+  </main>
+
+  <!-- Login / Join prompt modal (öffnet bei "Jetzt beitreten" und "Mehr Infos") -->
+  <div id="loginPrompt" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:9999;align-items:center;justify-content:center;">
+    <div style="background:#e6f7fb;padding:20px;border-radius:10px;max-width:420px;width:92%;box-shadow:0 10px 30px rgba(0,0,0,0.25);">
+      <h3 style="margin:0 0 8px;color:#023">Anmeldung erforderlich</h3>
+      <p style="margin:0 0 14px;color:#045">Um diese Aktion auszuführen musst du dich anmelden oder registrieren.</p>
+      <div style="display:flex;gap:10px;justify-content:center">
+        <!-- Anmelden führt jetzt genauso zur Registrierung wie gewünscht -->
+        <a href="login.html" style="background:rgba(0,0,0,0.18);color:#fff;padding:10px 14px;border-radius:8px;text-decoration:none;font-weight:700">Anmelden</a>
+        <a href="registrieren.html" style="background:rgba(0,0,0,0.08);color:#012;padding:10px 14px;border-radius:8px;text-decoration:none;font-weight:700">Registrieren</a>
+      </div>
+      <div style="text-align:center;margin-top:12px">
+        <button id="closeLoginPrompt" style="background:none;border:1px solid rgba(0,0,0,0.08);padding:6px 10px;border-radius:6px;cursor:pointer">Schließen</button>
+      </div>
+    </div>
+  </div>
+
+<script>
+  // Auth UI toggle
+  (function(){
+    const raw = sessionStorage.getItem('loggedInUser');
+    const notLogged = document.getElementById('notLogged');
+    const logged = document.getElementById('logged');
+    if(raw){
+      const user = JSON.parse(raw);
+      document.getElementById('userLabel').textContent = user.username ? `Angemeldet als ${user.username}` : 'Angemeldet';
+      notLogged.style.display = 'none';
+      logged.style.display = 'block';
+    } else {
+      notLogged.style.display = 'block';
+      logged.style.display = 'none';
+    }
+  })();
+
+  document.getElementById('logoutBtn')?.addEventListener('click', ()=>{
+    sessionStorage.removeItem('loggedInUser');
+    window.location.href = 'login.html';
+  });
+
+  // Öffnet das Anmelde-Prompt (falls nicht eingeloggt)
+  function openLoginPrompt(){
+    const logged = sessionStorage.getItem('loggedInUser');
+    if(logged){
+      // angemeldet -> normale Weiterleitung zu Mehr Infos / Join
+      // (Mehr Infos sollte zur seite2.html führen, Join ggf. zur registrieren oder Profil)
+      return;
+    }
+    document.getElementById('loginPrompt').style.display = 'flex';
+  }
+  document.getElementById('closeLoginPrompt').addEventListener('click', ()=>{
+    document.getElementById('loginPrompt').style.display = 'none';
+  });
+
+  // Buttons anpassen: Jetzt beitreten + Mehr Infos öffnen das Login-Prompt (wenn nicht eingeloggt)
+  document.getElementById('joinBtn').addEventListener('click', ()=>{
+    const raw = sessionStorage.getItem('loggedInUser');
+    if(raw){
+      // wenn schon angemeldet: weiterleiten zur Registrierung oder Profil
+      window.location.href = 'registrieren.html';
+    } else {
+      openLoginPrompt();
+    }
+  });
+
+  document.getElementById('moreInfoBtn').addEventListener('click', ()=>{
+    const raw = sessionStorage.getItem('loggedInUser');
+    if(raw){
+      window.location.href = 'seite2.html';
+    } else {
+      openLoginPrompt();
+    }
+  });
+</script>
+</body>
+</html>

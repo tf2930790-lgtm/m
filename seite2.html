@@ -1,0 +1,366 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8"/>
+  <title>Server</title>
+  <style>
+    /* Basis / Header wie auf Seite 1 */
+    body {
+      background-color: lightblue;
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+    header {
+      position: relative;
+      background-color: rgb(30,103,128);
+      color: white;
+      height: 180px;
+      box-shadow: 25px 14px 126px 0px lightgoldenrodyellow inset;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 12px 24px;
+    }
+    .headline {
+      color: lightskyblue;
+      font-size: 40px;
+      margin: 0;
+      text-align: center;
+      line-height: 1;
+    }
+    .subhead {
+      color: #e6f7fb;
+      font-size: 18px;
+      margin-top: 6px;
+      text-align: center;
+    }
+
+    /* Auth area top-right */
+    .auth {
+      position: absolute;
+      top: 12px;
+      right: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      align-items: flex-end;
+    }
+    .auth a, .auth button {
+      display: inline-block;
+      text-decoration: none;
+      color: white;
+      background: rgba(0,0,0,0.18);
+      padding: 8px 14px;
+      border-radius: 6px;
+      font-weight: 600;
+      transition: background 0.12s, transform 0.08s;
+      border: none;
+      cursor: pointer;
+    }
+    .auth a:hover, .auth button:hover {
+      background: rgba(255,255,255,0.12);
+      transform: translateY(-1px);
+    }
+    .user-label {
+      font-size: 14px;
+      color: #dff6ff;
+      margin-bottom: 6px;
+      text-align: right;
+    }
+
+    /* Seiten-Inhalt */
+    main { padding: 24px; max-width: 1100px; margin: 0 auto; }
+    .top { display:flex; justify-content:space-between; align-items:center; }
+    button#logout { padding:8px 12px; }
+
+    /* Karussell */
+    .carousel-wrap {
+      position: relative;
+      width: 100%;
+      max-width: 860px;
+      margin: 18px auto;
+      overflow: hidden;
+      border-radius: 8px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+      background: transparent; /* weißer Hintergrund entfernt */
+    }
+    .carousel {
+      display: flex;
+      transition: transform 420ms ease;
+      will-change: transform;
+    }
+    .slide {
+      flex: 0 0 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 12px;
+      box-sizing: border-box;
+      height: 320px;
+    }
+    .slide img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: cover;
+      border-radius: 6px;
+    }
+
+    /* Pfeile */
+    .arrow {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      background: rgba(0,0,0,0.45);
+      color: #fff;
+      border: none;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      cursor: pointer;
+      transition: transform .08s, background .12s;
+      z-index: 5;
+    }
+    .arrow:hover { transform: translateY(-50%) scale(1.06); background: rgba(0,0,0,0.6); }
+    .arrow.left { left: 12px; }
+    .arrow.right { right: 12px; }
+
+    /* Dots */
+    .dots {
+      display:flex;
+      gap:8px;
+      justify-content:center;
+      padding:12px 0 6px;
+    }
+    .dot {
+      width:10px;
+      height:10px;
+      background: rgba(0,0,0,0.25);
+      border-radius:50%;
+      cursor:pointer;
+      transition: background .12s, transform .12s;
+    }
+    .dot.active { background: rgba(0,0,0,0.7); transform: scale(1.15); }
+
+    /* Grosser Call-to-Action Button (unter dem Karussell) */
+    .big-cta {
+      display: block;
+      margin: 18px auto 36px;
+      padding: 18px 28px;
+      font-size: 20px;
+      background: rgba(0,0,0,0.18);
+      color: #fff;
+      border-radius: 10px;
+      border: none;
+      cursor: pointer;
+      font-weight: 700;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+      transition: transform .08s, background .12s;
+      text-align: center;
+      text-decoration: none;
+      max-width: 480px;
+    }
+    .big-cta:hover { transform: translateY(-3px); background: rgba(255,255,255,0.08); }
+
+    @media (max-width: 800px) {
+      .slide { height: 220px; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="auth" id="authArea">
+      <div id="logged" style="display:none; text-align:right;">
+        <div class="user-label" id="userLabel"></div>
+        <a class="btn" id="helpLink" href="hilfe.html">Hilfe</a>
+        <button id="logout">Abmelden</button>
+      </div>
+    </div>
+
+    <h1 class="headline">Server</h1>
+    <p class="subhead">Hier findest du Server-IP, Discord und eine nette Community</p>
+  </header>
+
+  <main>
+    <!-- Karussell mit 4 Bildern (unendliche Schleife, Autoplay, Pfeile) -->
+    <div class="carousel-wrap" id="carouselWrap">
+      <button class="arrow left" id="prev" aria-label="Vorheriges">&#10094;</button>
+      <div class="carousel" id="carousel">
+        <!-- Klone für nahtlosen Übergang werden per JS erstellt -->
+        <div class="slide"><img src="Bild1.png" alt="Bild 1"></div>
+        <div class="slide"><img src="bild2.png" alt="Bild 2"></div>
+        <div class="slide"><img src="Bild3.png" alt="Bild 3"></div>
+        <div class="slide"><img src="Bild4.png" alt="Bild 4"></div>
+      </div>
+      <button class="arrow right" id="next" aria-label="Nächstes">&#10095;</button>
+    </div>
+
+    <div class="dots" id="dots" aria-hidden="false"></div>
+
+    <a href="infos.html" class="big-cta" id="openData">Zur Server-Information</a>
+    
+  </main>
+
+<script>
+(function(){
+  const raw = sessionStorage.getItem('loggedInUser');
+  if(!raw){
+    window.location.href = 'login.html';
+    return;
+  }
+  const user = JSON.parse(raw);
+  const userLabel = document.getElementById('userLabel');
+  userLabel.textContent = user.username ? `Angemeldet als ${user.username}` : 'Angemeldet';
+  document.getElementById('logged').style.display = 'block';
+})();
+
+function doLogout(){
+  sessionStorage.removeItem('loggedInUser');
+  window.location.href = 'login.html';
+}
+const logoutBtn = document.getElementById('logout');
+if(logoutBtn) logoutBtn.addEventListener('click', doLogout);
+
+/* Karussell-Logik: infinite loop via clones + autoplay + arrow/dot controls */
+(function(){
+  const carousel = document.getElementById('carousel');
+  const slides = Array.from(carousel.querySelectorAll('.slide'));
+  const wrap = document.getElementById('carouselWrap');
+  const prevBtn = document.getElementById('prev');
+  const nextBtn = document.getElementById('next');
+  const dotsEl = document.getElementById('dots');
+
+  if(slides.length === 0) return;
+
+  // create clones for seamless looping
+  const firstClone = slides[0].cloneNode(true);
+  const lastClone = slides[slides.length-1].cloneNode(true);
+  firstClone.dataset.clone = 'first';
+  lastClone.dataset.clone = 'last';
+  carousel.appendChild(firstClone);
+  carousel.insertBefore(lastClone, carousel.firstChild);
+
+  let slideCount = slides.length;
+  let index = 1; // because of added clone at start
+  const slideWidth = () => carousel.clientWidth;
+  let isTransitioning = false;
+  let autoplayInterval = 3000;
+  let timer = null;
+
+  // set initial position
+  function setPosition(instant){
+    const tx = -index * slideWidth();
+    if(instant) {
+      carousel.style.transition = 'none';
+      carousel.style.transform = `translateX(${tx}px)`;
+      // force reflow then restore transition
+      void carousel.offsetWidth;
+      carousel.style.transition = 'transform 420ms ease';
+    } else {
+      carousel.style.transform = `translateX(${tx}px)`;
+    }
+  }
+
+  // resize handler: keep correct position
+  window.addEventListener('resize', ()=> setPosition(true));
+
+  // build dots
+  const dots = [];
+  for(let i=0;i<slideCount;i++){
+    const d = document.createElement('div');
+    d.className = 'dot';
+    d.dataset.i = i;
+    d.addEventListener('click', ()=> goTo(i+1));
+    dotsEl.appendChild(d);
+    dots.push(d);
+  }
+  function updateDots(){
+    dots.forEach((d, idx)=> d.classList.toggle('active', idx === (index-1+slideCount)%slideCount));
+  }
+
+  // navigation functions
+  function next(){
+    if(isTransitioning) return;
+    index++;
+    isTransitioning = true;
+    setPosition(false);
+    updateDots();
+  }
+  function prev(){
+    if(isTransitioning) return;
+    index--;
+    isTransitioning = true;
+    setPosition(false);
+    updateDots();
+  }
+  function goTo(i){ // i is target index in carousel (1..slideCount)
+    if(isTransitioning) return;
+    index = i;
+    isTransitioning = true;
+    setPosition(false);
+    updateDots();
+  }
+
+  carousel.addEventListener('transitionend', ()=>{
+    isTransitioning = false;
+    // loop fixes when on cloned slides
+    const slidesAll = carousel.querySelectorAll('.slide');
+    if(slidesAll[index].dataset.clone === 'first'){
+      index = 1;
+      setPosition(true);
+    } else if(slidesAll[index].dataset.clone === 'last'){
+      index = slideCount;
+      setPosition(true);
+    }
+  });
+
+  prevBtn.addEventListener('click', ()=>{
+    prev();
+    restartTimer();
+  });
+  nextBtn.addEventListener('click', ()=>{
+    next();
+    restartTimer();
+  });
+
+  function startTimer(){
+    stopTimer();
+    timer = setInterval(()=> {
+      next();
+    }, autoplayInterval);
+  }
+  function stopTimer(){ if(timer) { clearInterval(timer); timer = null; } }
+  function restartTimer(){ stopTimer(); startTimer(); }
+
+  // pause on hover/focus
+  wrap.addEventListener('mouseenter', stopTimer);
+  wrap.addEventListener('mouseleave', startTimer);
+  wrap.addEventListener('focusin', stopTimer);
+  wrap.addEventListener('focusout', startTimer);
+
+  // ensure initial sizing: each slide must match wrap width
+  function adjustSlideSizes(){
+    const w = wrap.clientWidth;
+    carousel.querySelectorAll('.slide').forEach(s => s.style.width = w + 'px');
+    // set container transform to show first real slide
+    setPosition(true);
+    updateDots();
+  }
+  // initial setup
+  adjustSlideSizes();
+  window.addEventListener('resize', adjustSlideSizes);
+
+  // keyboard support
+  document.addEventListener('keydown', (e)=>{
+    if(e.key === 'ArrowLeft') { prev(); restartTimer(); }
+    if(e.key === 'ArrowRight') { next(); restartTimer(); }
+  });
+
+  // start autoplay
+  startTimer();
+})();
+</script>
+</body>
+</html>

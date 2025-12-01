@@ -1,0 +1,146 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8"/>
+  <title>Registrieren</title>
+  <style>
+    /* Global */
+    body {
+      background-color: lightblue;
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    /* Header layout */
+    header {
+      position: relative; /* container for absolute .auth */
+      background-color: rgb(30,103,128);
+      color: white;
+      height: 180px;
+      box-shadow: 25px 14px 126px 0px lightgoldenrodyellow inset;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 12px 24px;
+    }
+
+    .headline {
+      color: lightskyblue;
+      font-size: 40px;
+      margin: 0;
+      text-align: center;
+      line-height: 1;
+    }
+
+    .subhead {
+      color: #e6f7fb;
+      font-size: 18px;
+      margin-top: 6px;
+      text-align: center;
+    }
+
+    /* Auth buttons stacked top-right */
+    .auth {
+      position: absolute;
+      top: 12px;
+      right: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      align-items: flex-end;
+    }
+
+    .auth a {
+      display: inline-block;
+      text-decoration: none;
+      color: white;
+      background: rgba(0,0,0,0.18);
+      padding: 8px 14px;
+      border-radius: 6px;
+      font-weight: 600;
+      transition: background 0.12s, transform 0.08s;
+    }
+    .auth a:hover {
+      background: rgba(255,255,255,0.12);
+      transform: translateY(-1px);
+    }
+
+    /* Page content */
+    main {
+      padding: 24px;
+      text-align: center;
+    }
+
+    form { display: inline-block; text-align: left; margin-top: 18px; }
+    label { display:block; margin:6px 0; }
+    input { padding:6px; width:260px; }
+    button[type="submit"] { margin-top:10px; padding:8px 14px; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="auth">
+      <a href="login.html">Anmelden</a>
+      <a href="registrieren.html">Registrieren</a>
+      <a class="btn" id="helpLink" href="hilfe.html">Hilfe</a>
+    </div>
+
+    <h1 class="headline">Willkommen</h1>
+    <p class="subhead">Hier gibt es immer neue Sachen zu unserem Server</p>
+  </header>
+
+  <main>
+    <h2>Registrieren</h2>
+    <form id="regForm">
+      <label>Benutzername <input name="username" required></label>
+      <label>Email <input name="email" type="email" required></label>
+      <label>Passwort <input name="password" type="password" required></label>
+      <button type="submit">Registrieren</button>
+    </form>
+    <p id="msg"></p>
+  </main>
+
+<script>
+async function sha256Hex(text){
+  const enc = new TextEncoder();
+  const hashBuffer = await crypto.subtle.digest('SHA-256', enc.encode(text));
+  return Array.from(new Uint8Array(hashBuffer)).map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+
+document.getElementById('regForm').addEventListener('submit', async (e)=>{
+  e.preventDefault();
+  const f = e.target;
+  const username = f.username.value.trim();
+  const email = f.email.value.trim();
+  const pwd = f.password.value;
+
+  if(!username || !email || !pwd){ document.getElementById('msg').textContent = 'Bitte alle Felder ausfüllen.'; return; }
+
+  const pwdHash = await sha256Hex(pwd);
+
+  const users = JSON.parse(localStorage.getItem('users') || '[]');
+
+  if(users.some(u => u.username === username)){
+    document.getElementById('msg').textContent = 'Benutzername bereits vergeben.';
+    return;
+  }
+
+  users.push({ username, email, pwdHash, created: Date.now() });
+  localStorage.setItem('users', JSON.stringify(users));
+
+  sessionStorage.setItem('loggedInUser', JSON.stringify({ username, email }));
+  document.getElementById('msg').textContent = 'Registrierung erfolgreich. Du wirst weitergeleitet...';
+  setTimeout(()=> { window.location.href = 'seite2.html'; }, 300);
+});
+
+// falls bereits angemeldet -> direkt weiterleiten
+(function(){
+  const logged = sessionStorage.getItem('loggedInUser');
+  if(logged){
+    window.location.href = 'seite2.html';
+  }
+})();
+</script>
+</body>
+</html>

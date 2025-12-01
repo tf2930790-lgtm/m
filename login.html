@@ -1,0 +1,129 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8"/>
+  <title>Anmelden</title>
+  <style>label{display:block;margin:6px 0}</style>
+</head>
+<body>
+        <header>
+        <div class="auth" id="authArea">
+        <div id="notLogged">
+            <a href="login.html">Anmelden</a>
+            <a href="registrieren.html">Registrieren</a>
+            <a class="btn" href="hilfe.html">Hilfe</a>
+        </div>
+        <div id="logged" style="display:none; text-align:right;">
+            <div class="user-label" id="userLabel" style="color:#dff6ff; font-size:14px; margin-bottom:6px;"></div>
+            <a class="btn" href="hilfe.html">Hilfe</a>
+            <button id="logoutBtn">Abmelden</button>
+        </div>
+        </div>
+        <h1 class="headline">Willkommen zurück</h1>
+        <div class="subhead">Melde dich an, um fortzufahren</div>
+    </header>
+  <h2>Anmelden</h2>
+  <form id="loginForm">
+    <label>Benutzername <input name="username" required></label>
+    <label>Passwort <input name="password" type="password" required></label>
+    <button type="submit">Anmelden</button>
+  </form>
+  <p id="msg"></p>
+<style>
+   
+    :root{ --accent: rgb(30,103,128); --muted: rgba(255,255,255,0.06); }
+    body { background-color: lightblue; margin: 0; font-family: Arial, Helvetica, sans-serif; color: #012; }
+    header { position: relative; background-color: var(--accent); color: white; height: 180px; box-shadow: 25px 14px 126px 0px lightgoldenrodyellow inset; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 12px 24px; }
+    .headline { color: lightskyblue; font-size: 40px; margin: 0; text-align: center; line-height: 1; }
+    .subhead { color: #e6f7fb; font-size: 18px; margin-top: 6px; text-align: center; }
+
+    .auth { position: absolute; top: 12px; right: 16px; display: flex; flex-direction: column; gap: 8px; align-items: flex-end; }
+    .auth a, .auth button { display: inline-block; text-decoration: none; color: white; background: rgba(0,0,0,0.18); padding: 8px 14px; border-radius: 6px; font-weight: 600; border: none; cursor: pointer; }
+
+    main { max-width: 1100px; margin: 22px auto; padding: 0 18px; }
+
+    /* Hero */
+    .hero { display: grid; grid-template-columns: 1fr 420px; gap: 18px; align-items: center; margin-bottom: 22px; }
+    .hero .intro { background: var(--muted); padding: 18px; border-radius: 12px; box-shadow: 0 8px 20px rgba(0,0,0,0.06); }
+    .hero h2 { margin-top: 0; color: #003; }
+    .hero p { margin: 10px 0 0; color: #023; line-height: 1.5; }
+    .hero .hero-image { width: 100%; height: 260px; border-radius: 12px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.12); }
+    .hero .hero-image img { width:100%; height:100%; object-fit:cover; display:block; }
+
+    /* Features */
+    .features { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 12px; }
+    .card { background: rgba(255,255,255,0.06); padding: 16px; border-radius: 10px; text-align: center; box-shadow: 0 8px 20px rgba(0,0,0,0.06); }
+    .card img { width: 100%; height: 140px; object-fit:cover; border-radius: 8px; margin-bottom: 10px; }
+    .card h3 { margin: 6px 0; color:#023; }
+    .card p { margin: 0; color:#045; font-size:14px; }
+
+    /* Gallery */
+    .gallery { display:flex; gap:12px; margin-top:18px; justify-content:center; flex-wrap:wrap; }
+    .gallery img { width: 48%; max-width:360px; height:200px; object-fit:cover; border-radius:10px; box-shadow:0 8px 20px rgba(0,0,0,0.08); }
+    .gallery .caption { text-align:center; width:100%; color:#023; margin-top:8px; font-weight:600; }
+
+    /* CTA */
+    .cta-row { display:flex; gap:12px; justify-content:center; margin: 22px 0; flex-wrap:wrap; }
+    .btn-cta { background: rgba(0,0,0,0.18); color: #fff; padding: 14px 20px; border-radius: 10px; text-decoration: none; font-weight: 800; box-shadow: 0 8px 20px rgba(0,0,0,0.12); cursor:pointer; border:none; }
+    .btn-cta.secondary { background: rgba(0,0,0,0.08); color: #012; font-weight:700; }
+
+    h2 {
+      color: #023;
+      font-size: 28px;
+      margin-top: 0;
+      text-align: center;
+    }
+    form {
+      background: rgba(255,255,255,0.06);
+      padding: 16px;
+      border-radius: 10px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+      max-width: 400px;
+      margin: 0 auto;
+    }
+    @media (max-width: 980px){ .hero { grid-template-columns: 1fr; } .features { grid-template-columns: 1fr; } .gallery img { width:100%; max-width:100%; } }
+  </style>
+</head>
+<body>
+
+ 
+<script>
+async function sha256Hex(text){
+  const enc = new TextEncoder();
+  const hashBuffer = await crypto.subtle.digest('SHA-256', enc.encode(text));
+  return Array.from(new Uint8Array(hashBuffer)).map(b=>b.toString(16).padStart(2,'0')).join('');
+}
+
+function getUser(username){
+  const users = JSON.parse(localStorage.getItem('users') || '[]');
+  return users.find(u=> u.username === username) || null;
+}
+
+// Falls bereits eingeloggt -> sofort weiterleiten
+(function(){
+  const logged = sessionStorage.getItem('loggedInUser');
+  if(logged){
+    window.location.href = 'seite2.html';
+  }
+})();
+
+document.getElementById('loginForm').addEventListener('submit', async (e)=>{
+  e.preventDefault();
+  const f = e.target;
+  const username = f.username.value.trim();
+  const pwd = f.password.value;
+  const user = getUser(username);
+  if(!user){ document.getElementById('msg').textContent = 'Benutzer nicht gefunden.'; return; }
+
+  const pwdHash = await sha256Hex(pwd);
+  if(pwdHash === user.pwdHash){
+    sessionStorage.setItem('loggedInUser', JSON.stringify({ username: user.username, email: user.email }));
+    // Weiterleitung zur geschützten Seite
+    window.location.href = 'seite2.html';
+  } else {
+    document.getElementById('msg').textContent = 'Falsches Passwort.';
+  }
+});
+</script>
+</body>
+</html>

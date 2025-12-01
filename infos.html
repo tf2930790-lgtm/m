@@ -1,0 +1,301 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8"/>
+  <title>Server-Info</title>
+  <style>
+    body {
+      background-color: lightblue;
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+    header {
+      position: relative;
+      background-color: rgb(30,103,128);
+      color: white;
+      height: 180px;
+      box-shadow: 25px 14px 126px 0px lightgoldenrodyellow inset;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 12px 24px;
+    }
+    .headline { color: lightskyblue; font-size: 40px; margin: 0; text-align: center; line-height: 1; }
+    .subhead { color: #e6f7fb; font-size: 18px; margin-top: 6px; text-align: center; }
+
+    .auth {
+      position: absolute;
+      top: 12px;
+      right: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      align-items: flex-end;
+    }
+    .auth a, .auth button {
+      display: inline-block;
+      text-decoration: none;
+      color: white;
+      background: rgba(0,0,0,0.18);
+      padding: 8px 14px;
+      border-radius: 6px;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+      transition: background .12s, transform .08s;
+    }
+    .auth a:hover, .auth button:hover { background: rgba(255,255,255,0.12); transform: translateY(-1px); }
+    .user-label { font-size: 14px; color: #dff6ff; margin-bottom: 6px; text-align: right; }
+
+    main { padding: 24px; max-width: 900px; margin: 0 auto; text-align: center; }
+    .card {
+      background: rgba(255,255,255,0.06);
+      padding: 18px;
+      border-radius: 10px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+      margin: 18px 0;
+    }
+    .ip {
+      font-size: 20px;
+      font-weight: 700;
+      color: #023;
+      margin: 8px 0 16px;
+      display: inline-block;
+      background: rgba(255,255,255,0.9);
+      padding: 10px 14px;
+      border-radius: 6px;
+      color: #012;
+    }
+    .controls { display:flex; gap:12px; justify-content:center; flex-wrap:wrap; margin-top:8px; }
+    .btn {
+      background: rgba(0,0,0,0.18);
+      color: #fff;
+      padding: 12px 18px;
+      border-radius: 8px;
+      border:none;
+      cursor:pointer;
+      font-weight:700;
+      text-decoration:none;
+      transition: transform .08s, background .12s;
+    }
+    .btn:hover { transform: translateY(-2px); background: rgba(255,255,255,0.08); }
+    .discord {
+      display:inline-flex;
+      gap:8px;
+      align-items:center;
+    }
+    .tiny { font-size:13px; color:#034; margin-top:10px; }
+
+    /* Carousel styles (neu) */
+    .carousel-wrap {
+      position: relative;
+      width: 100%;
+      max-width: 860px;
+      margin: 18px auto;
+      overflow: hidden;
+      border-radius: 8px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.12);
+      background: transparent;
+    }
+    .carousel {
+      display: flex;
+      transition: transform 420ms ease;
+      will-change: transform;
+    }
+    .slide {
+      flex: 0 0 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 12px;
+      box-sizing: border-box;
+      height: 260px;
+    }
+    .slide img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: cover;
+      border-radius: 6px;
+    }
+    .arrow {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      background: rgba(0,0,0,0.45);
+      color: #fff;
+      border: none;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      cursor: pointer;
+      z-index: 5;
+    }
+    .arrow.left { left: 12px; }
+    .arrow.right { right: 12px; }
+    .dots { display:flex; gap:8px; justify-content:center; padding:12px 0 6px; }
+    .dot { width:10px; height:10px; background: rgba(0,0,0,0.25); border-radius:50%; cursor:pointer; }
+    .dot.active { background: rgba(0,0,0,0.7); transform: scale(1.15); }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="auth" id="authArea">
+      <div id="logged" style="display:none; text-align:right;">
+        <div class="user-label" id="userLabel"></div>
+        <a class="btn" id="helpLink" href="hilfe.html">Hilfe</a>
+        <button id="logout">Abmelden</button>
+      </div>
+    </div>
+
+    <h1 class="headline">Server-Information</h1>
+    <p class="subhead">Kopiere die Minecraft-Adresse oder trete unserem Discord bei</p>
+  </header>
+
+  <main>
+    <div class="card">
+      <h2>Minecraft Server</h2>
+      <div id="serverIp" class="ip">MinecraftBoYs-BNmH.aternos.me</div>
+
+      <div class="controls">
+        <button id="copyBtn" class="btn">IP kopieren</button>
+        <a id="discordLink" class="btn discord" href="hilfe.html">Zum Hilfe-Chat</a>
+      </div>
+      <div id="copyMsg" class="tiny" aria-live="polite"></div>
+
+      <ul style="text-align:left; margin-top:12px; color:#023;">
+        <li><strong>Benötigte Minecraft-Version:</strong> 1.21.10</li>
+        <li><strong>Empfohlene Mods:</strong> Armored Elytra, Trade Cycle</li>
+      </ul>
+    </div>
+
+    <!-- Weitere Infos ersetzt durch Karussell -->
+    <div class="carousel-wrap" id="carouselWrap">
+      <button class="arrow left" id="prev" aria-label="Vorheriges">&#10094;</button>
+      <div class="carousel" id="carousel">
+        <div class="slide"><img src="Bild1.png" alt="Bild 1"></div>
+        <div class="slide"><img src="bild2.png" alt="Bild 2"></div>
+        <div class="slide"><img src="Bild3.png" alt="Bild 3"></div>
+        <div class="slide"><img src="Bild4.png" alt="Bild 4"></div>
+      </div>
+      <button class="arrow right" id="next" aria-label="Nächstes">&#10095;</button>
+    </div>
+    <div class="dots" id="dots"></div>
+  </main>
+
+<script>
+    (function(){
+      const raw = sessionStorage.getItem('loggedInUser');
+      if(!raw){
+        window.location.href = 'login.html';
+        return;
+      }
+      const user = JSON.parse(raw);
+      document.getElementById('userLabel').textContent = user.username ? `Angemeldet als ${user.username}` : 'Angemeldet';
+      document.getElementById('logged').style.display = 'block';
+    })();
+
+    // logout
+    function doLogout(){ sessionStorage.removeItem('loggedInUser'); window.location.href = 'login.html'; }
+    const logoutBtn = document.getElementById('logout');
+    if(logoutBtn) logoutBtn.addEventListener('click', doLogout);
+
+    // Copy IP
+    const copyBtn = document.getElementById('copyBtn');
+    const serverIpEl = document.getElementById('serverIp');
+    const copyMsg = document.getElementById('copyMsg');
+
+    copyBtn.addEventListener('click', async () => {
+      const ip = serverIpEl.textContent.trim();
+      try{
+        await navigator.clipboard.writeText(ip);
+        copyMsg.textContent = 'IP-Adresse kopiert!';
+        copyBtn.textContent = 'Kopiert ✓';
+        setTimeout(()=>{ copyMsg.textContent=''; copyBtn.textContent='IP kopieren'; }, 1800);
+      }catch(e){
+        // Fallback: select text
+        const range = document.createRange();
+        range.selectNodeContents(serverIpEl);
+        const sel = window.getSelection();
+        sel.removeAllRanges();
+        sel.addRange(range);
+        copyMsg.textContent = 'Kopieren nicht möglich — markiert. Strg+C drücken.';
+      }
+    });
+
+    /* Carousel logic (kopiert / leicht angepasst) */
+    (function(){
+      const carousel = document.getElementById('carousel');
+      const wrap = document.getElementById('carouselWrap');
+      const prevBtn = document.getElementById('prev');
+      const nextBtn = document.getElementById('next');
+      const dotsEl = document.getElementById('dots');
+      const slidesOrig = Array.from(carousel.querySelectorAll('.slide'));
+      if(slidesOrig.length === 0) return;
+
+      const firstClone = slidesOrig[0].cloneNode(true);
+      const lastClone = slidesOrig[slidesOrig.length-1].cloneNode(true);
+      firstClone.dataset.clone = 'first';
+      lastClone.dataset.clone = 'last';
+      carousel.appendChild(firstClone);
+      carousel.insertBefore(lastClone, carousel.firstChild);
+
+      let slideCount = slidesOrig.length;
+      let index = 1;
+      let timer = null;
+      const autoplayInterval = 3000;
+      let isTransitioning = false;
+
+      function slideWidth(){ return wrap.clientWidth; }
+      function setPosition(instant){
+        const tx = -index * slideWidth();
+        if(instant){ carousel.style.transition = 'none'; carousel.style.transform = `translateX(${tx}px)`; void carousel.offsetWidth; carousel.style.transition = 'transform 420ms ease'; }
+        else carousel.style.transform = `translateX(${tx}px)`;
+      }
+
+      function adjustSlideSizes(){
+        const w = wrap.clientWidth;
+        carousel.querySelectorAll('.slide').forEach(s => s.style.width = w + 'px');
+        setPosition(true);
+        updateDots();
+      }
+      window.addEventListener('resize', adjustSlideSizes);
+
+      // dots
+      const dots = [];
+      for(let i=0;i<slideCount;i++){
+        const d = document.createElement('div'); d.className='dot'; d.dataset.i = i;
+        d.addEventListener('click', ()=> goTo(i+1));
+        dotsEl.appendChild(d); dots.push(d);
+      }
+      function updateDots(){ dots.forEach((d, idx)=> d.classList.toggle('active', idx === (index-1+slideCount)%slideCount)); }
+
+      function next(){ if(isTransitioning) return; index++; isTransitioning = true; setPosition(false); updateDots(); }
+      function prev(){ if(isTransitioning) return; index--; isTransitioning = true; setPosition(false); updateDots(); }
+      function goTo(i){ if(isTransitioning) return; index = i; isTransitioning = true; setPosition(false); updateDots(); }
+
+      carousel.addEventListener('transitionend', ()=>{
+        isTransitioning = false;
+        const slidesAll = carousel.querySelectorAll('.slide');
+        if(slidesAll[index].dataset.clone === 'first'){ index = 1; setPosition(true); }
+        else if(slidesAll[index].dataset.clone === 'last'){ index = slideCount; setPosition(true); }
+      });
+
+      prevBtn.addEventListener('click', ()=>{ prev(); restartTimer(); });
+      nextBtn.addEventListener('click', ()=>{ next(); restartTimer(); });
+
+      function startTimer(){ stopTimer(); timer = setInterval(()=> next(), autoplayInterval); }
+      function stopTimer(){ if(timer){ clearInterval(timer); timer = null; } }
+      function restartTimer(){ stopTimer(); startTimer(); }
+
+      wrap.addEventListener('mouseenter', stopTimer);
+      wrap.addEventListener('mouseleave', startTimer);
+
+      adjustSlideSizes();
+      startTimer();
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,219 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8"/>
+  <title>Hilfe</title>
+  <style>
+    /* Gleicher Header-Look wie andere Seiten */
+    body {
+      background-color: lightblue;
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      color: #012;
+    }
+    header {
+      position: relative;
+      background-color: rgb(30,103,128);
+      color: white;
+      height: 180px;
+      box-shadow: 25px 14px 126px 0px lightgoldenrodyellow inset;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 12px 24px;
+    }
+    .headline { color: lightskyblue; font-size: 40px; margin: 0; text-align: center; line-height: 1; }
+    .subhead { color: #e6f7fb; font-size: 18px; margin-top: 6px; text-align: center; }
+
+    .auth {
+      position: absolute;
+      top: 12px;
+      right: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      align-items: flex-end;
+    }
+    .auth .btn {
+      display: inline-block;
+      text-decoration: none;
+      color: white;
+      background: rgba(0,0,0,0.18);
+      padding: 8px 14px;
+      border-radius: 6px;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+    }
+
+    /* Chat UI */
+    main { padding: 18px; max-width: 900px; margin: 0 auto; }
+    .card {
+      background: rgba(255,255,255,0.06);
+      padding: 16px;
+      border-radius: 10px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+    }
+
+    .chat {
+      height: 420px;
+      border-radius: 8px;
+      background: rgba(255,255,255,0.02);
+      border: 1px solid rgba(0,0,0,0.06);
+      display:flex;
+      flex-direction:column;
+      overflow:hidden;
+    }
+    .messages {
+      flex:1;
+      overflow:auto;
+      padding:12px;
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+    }
+    .msg { max-width:78%; padding:10px 12px; border-radius:12px; line-height:1.3; }
+    .msg.user { align-self:flex-end; background: rgba(0,0,0,0.15); color: #fff; }
+    .msg.bot { align-self:flex-start; background: rgba(255,255,255,0.9); color:#012; }
+    .input-row { display:flex; gap:8px; padding:10px; border-top:1px solid rgba(0,0,0,0.06); background: rgba(255,255,255,0.01); }
+    .input-row input { flex:1; padding:10px; border-radius:8px; border:1px solid rgba(0,0,0,0.08); }
+    .input-row button { padding:10px 14px; border-radius:8px; border:none; background: rgba(0,0,0,0.18); color:#fff; cursor:pointer; font-weight:700; }
+
+    .hint { margin-top:10px; font-size:13px; color:#023; }
+    .small-actions { display:flex; gap:8px; justify-content:center; margin-top:12px; flex-wrap:wrap; }
+    .small-actions a, .small-actions button { padding:8px 12px; background: rgba(0,0,0,0.12); color:#fff; border-radius:8px; text-decoration:none; border:none; cursor:pointer; font-weight:600; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="auth" id="authArea">
+      <div id="logged" style="display:none; text-align:right;">
+        <div class="user-label" id="userLabel" style="color:#dff6ff; font-size:14px; margin-bottom:6px;"></div>
+        <span class="btn" aria-hidden="true">Hilfe (Chat)</span>
+        <button id="logout" class="btn">Abmelden</button>
+      </div>
+      <div id="notLogged" style="display:none; text-align:right;">
+        <a class="btn" href="login.html">Anmelden</a>
+        <a class="btn" href="registrieren.html">Registrieren</a>
+        <a class="btn" href="hilfe.html">Hilfe (Chat)</a>
+      </div>
+    </div>
+
+    <h1 class="headline">Hilfe</h1>
+    <p class="subhead">Chatte mit dem Assistenten oder trete unserem Discord bei</p>
+  </header>
+
+  <main>
+    <div class="card">
+      <div class="chat" role="region" aria-label="Hilfe Chat">
+        <div class="messages" id="messages"></div>
+
+        <div class="input-row">
+          <input id="userInput" placeholder="Beschreibe dein Problem (z. B. 'Login funktioniert nicht')" aria-label="Nachricht eingeben"/>
+          <button id="sendBtn">Senden</button>
+        </div>
+      </div>
+
+      <div class="small-actions" style="margin-top:14px">
+        <button id="quickServer">Server-IP kopieren</button>
+        <!-- Discord entfernt, Chatbot reicht -->
+        <a href="seite.html">Zur Homepage</a>
+      </div>
+
+      <div class="hint">Der Bot ist lokal und beantwortet häufige Fragen. Für persönliche Hilfe nutze den Discord.</div>
+    </div>
+  </main>
+
+<script>
+  // optional: show logged / not-logged UI
+  (function(){
+    const raw = sessionStorage.getItem('loggedInUser');
+    const loggedBlock = document.getElementById('logged');
+    const notLogged = document.getElementById('notLogged');
+    if(raw){
+      const user = JSON.parse(raw);
+      document.getElementById('userLabel').textContent = user.username ? `Angemeldet als ${user.username}` : 'Angemeldet';
+      loggedBlock.style.display = 'block';
+      notLogged.style.display = 'none';
+    } else {
+      loggedBlock.style.display = 'none';
+      notLogged.style.display = 'block';
+    }
+  })();
+
+  document.getElementById('logout')?.addEventListener('click', ()=>{
+    sessionStorage.removeItem('loggedInUser');
+    window.location.href = 'login.html';
+  });
+
+  // simple local rule-based chatbot
+  const messagesEl = document.getElementById('messages');
+  const input = document.getElementById('userInput');
+  const sendBtn = document.getElementById('sendBtn');
+
+  function appendMessage(role, text){
+    const el = document.createElement('div');
+    el.className = 'msg ' + (role === 'user' ? 'user' : 'bot');
+    el.textContent = text;
+    messagesEl.appendChild(el);
+    messagesEl.scrollTop = messagesEl.scrollHeight;
+  }
+
+  function botReply(userText){
+    const t = userText.toLowerCase();
+    // keyword rules
+    if(/server|ip|minecraft/.test(t)){
+      return "Die Server-IP ist: MinecraftBoYs-BNmH.aternos.me. Du kannst sie kopieren mit dem Knopf unten oder auf die Serverseite gehen.";
+    }
+    if(/login|anmelden|passwort|pw/.test(t)){
+      return "Wenn das Login nicht funktioniert: prüfe Benutzername/Passwort, versuche 'Passwort vergessen' oder registriere dich neu. Falls weiterhin Probleme, poste einen Screenshot im Discord.";
+    }
+    if(/registr|register|signup/.test(t)){
+      return "Zum Registrieren: Gehe auf 'Registrieren', fülle Benutzername/Email/Passwort aus. Nach erfolgreicher Registrierung wirst du automatisch angemeldet.";
+    }
+    if(/kopier|copy|clipboard/.test(t)){
+      return "Klicke auf 'Server-IP kopieren' — falls das nicht funktioniert, markiere die Adresse und drücke Strg+C.";
+    }
+    if(/discord|hilfe|support/.test(t)){
+      return "Ich kann hier helfen. Beschreibe dein Problem oder nutze 'Server-IP kopieren' — für persönlichen Support kontaktiere den Server-Owner.";
+    }
+    // fallback with suggestions
+    return "Tut mir leid, das verstehe ich nicht genau. Versuche: 'Server-IP', 'Login', 'Registrieren' oder 'Discord'.";
+  }
+
+  async function respond(userText){
+    appendMessage('user', userText);
+    // typing indicator
+    const typing = document.createElement('div');
+    typing.className = 'msg bot';
+    typing.textContent = 'schreibe...';
+    messagesEl.appendChild(typing);
+    messagesEl.scrollTop = messagesEl.scrollHeight;
+    // simulate thinking
+    await new Promise(r=> setTimeout(r, 600 + Math.min(userText.length*20, 1200)));
+    typing.remove();
+    appendMessage('bot', botReply(userText));
+  }
+
+  sendBtn.addEventListener('click', ()=>{
+    const v = input.value.trim();
+    if(!v) return;
+    input.value = '';
+    respond(v);
+    input.focus();
+  });
+  input.addEventListener('keydown', (e)=> { if(e.key === 'Enter'){ e.preventDefault(); sendBtn.click(); }});
+
+  // quick actions
+  document.getElementById('quickServer').addEventListener('click', async ()=>{
+    const ip = 'MinecraftBoYs-BNmH.aternos.me';
+    try{ await navigator.clipboard.writeText(ip); appendMessage('bot','IP kopiert: ' + ip); } 
+    catch(e){ appendMessage('bot','Kopieren nicht möglich. IP: ' + ip); }
+  });
+
+  // start welcome
+  appendMessage('bot', 'Hallo! Ich bin dein Helfer. Beschreibe kurz dein Problem oder klicke "Server-IP kopieren" / "Zum Discord".');
+</script>
+</body>
+</html>
